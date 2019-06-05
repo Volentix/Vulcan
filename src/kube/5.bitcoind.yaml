@@ -6,3 +6,9 @@ metadata:
 spec:
   chart: stable/bitcoind
   targetNamespace: vdex
+  valuesContent: |-
+    persistence:
+      enabled: true
+      storageClass: local-path
+    rbac:
+      install: true
