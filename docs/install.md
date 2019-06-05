@@ -6,9 +6,15 @@ The following guide you though the installation of Vulcan on your PC.
 This tutorial assumes that you are running Linux on your machine and that you have some basic knowledge of git.
 
 ## Make Workspace
-
+k3sdownloads
 Create a workspace to manage the download of code and operational artifacts.
 
+Go to your home directory:
+```
+cd ~
+```
+
+Create the k3sdownloads directory.
 ```
 mkdir k3sdownloads
 ```
@@ -26,6 +32,14 @@ which wget
 If you do not receive the following, you will need to install it.
 ```
 /usr/bin/wget
+```
+## Clone Vulcan
+
+You will need to clone Vulcan to get some of the helm charts as well as the yaml files required to run Vulcan.
+
+Inside the k3sdownloads directory, run the command:
+```
+git clone https://github.com/Volentix/Vulcan.git
 ```
 
 ## Get K3S
@@ -93,11 +107,13 @@ k3s kubectl apply -f local-path-storage.yaml
 
 ## Install Istio
 
+### Move Helm Charts
+
 First you mist move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
 
-The zip files can be found in the project root/src/helm directory.
+The zip files can be found in the project root/src/helm directory. If you created the k3sdownloads in the home directory, you can use the following.
 ```
-cd src/helm
+cd ~/k3sdownloads/Vulcan/src/helm
 ```
 
 Next copy the files over to the charts directory:
