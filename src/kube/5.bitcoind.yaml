@@ -10,5 +10,4 @@ spec:
     persistence:
       enabled: true
       storageClass: local-path
-    rbac:
-      install: true
+
