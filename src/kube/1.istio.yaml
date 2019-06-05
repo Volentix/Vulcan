@@ -1,8 +1,0 @@
-apiVersion: k3s.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: istio
-  namespace: kube-system
-spec:
-  chart: istio
-  targetNamespace: istio-system

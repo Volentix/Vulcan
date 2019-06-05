@@ -62,51 +62,6 @@ Test the instulation:
 sudo k3s kubectl --all-namespaces=true get all
 ```
 
-## Creating An Alias
-
-You will want to create an alias on your machine. Basically, for every command you need to write `k3s kubectl` if you don't.
-
-This document assumes that you will create an alias and so, all `k3s kubectl` statements will be replaced with the simple `k`.
-
-You can do it in one of two ways.
-
-### Short Term
-
-This alias is only usefull while you remain within one session of the terminal. Meaning, you will need to reset this alias upon launching a new terminal.
-
-Run the following on the command line:
-```
-alias k="k3s kubectl"
-```
-
-### Long Term
-
-This will allow any terminal access to the `k` alias.
-
-Open bashrc (I am using pico but you can choose whatever you like to edit):
-```
-sudo pico ~/.bashrc
-```
-
-Once open, add the following to the file:
-```
-alias k="k3s kubectl"
-```
-
-Refresh the terminal you are in:
-```
-source ~/.bashrc
-```
-
-### Test The Alias
-
-To test the alias, as well as view all the objects of the system, type:
-```
-k get all --all-namespaces
-```
-
-You should see a fairly verbose output
-
 ## Install Local Storage
 
 K3s does not ship with a default storage driver, however, they do supply a simple one for local storage. For now, this will be fine, however, in time, once larger Vulcan servers come on line, the operator will be able to plug in their own prefered storage driver.
@@ -117,5 +72,43 @@ curl -LO https://raw.githubusercontent.com/rancher/local-path-provisioner/master
 ```
 Once the script is available locally, you can run the following scipt:
 ```
-k apply -f local-path-storage.yaml
+k3s kubectl apply -f local-path-storage.yaml
+```
+
+## Install Istio
+
+First you mist move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
+
+The zip files can be found in the project root/src/helm directory.
+```
+cd src/helm
+```
+
+Next copy the files over to the charts directory:
+```
+cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
+cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
+```
+
+Once this is complete, cd back unt the src/kube directory
+
+### Set Up The Namespace
+
+Set up the namespace for Istio components to run within.
+```
+k3s kubectl apply -f 1.istio-namespace.yaml
+```
+
+### Init Istio
+
+Next init istio and install all the CRD's required to run istio
+```
+k3s kubectl apply -f 2.istio-init.yaml
+```
+
+### Main Istio
+
+Next install istio and its components.
+```
+k3s kubectl apply -f 3.istio-main.yaml
 ```

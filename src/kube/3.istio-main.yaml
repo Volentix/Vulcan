@@ -1,0 +1,8 @@
+apiVersion: k3s.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-main
+  namespace: kube-system
+spec:
+  chart: https://%{KUBERNETES_API}%/static/charts/istio.tgz
+  targetNamespace: istio-system
