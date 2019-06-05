@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vdex-node-0
+  namespace: vdex
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        application: vdex-node-0
+        name: vdex-node-0
+        version: "0.1.0"
+    spec:
+      containers:
+      - command: ["/bin/sh","-c"]
+        args: ["cd tools && ./dhtnode -p 1197 && sleep 5d"]
+        name: vdex-node-0
+        image: sillyvain/volentixlabs:0.0.4
+        ports:
+        - containerPort: 1197
