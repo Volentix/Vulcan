@@ -175,4 +175,6 @@ k3s kubectl apply -f 3.istio-main.yaml
 ```
 Isto is now integrated into K3s and you can begin your development against it.
 
+## Istio Auto Magic Injection
+
 Namespaces, such as vdex, will need to label themselves with the `istio-injection=enabled`. With this annotation, pods deployed will be injected with the appropriate envoy cartridges to capture telemetry metrics and manage security.
