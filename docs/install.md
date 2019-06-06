@@ -6,7 +6,7 @@ The following guide you though the installation of Vulcan on your PC.
 This tutorial assumes that you are running Linux on your machine and that you have some basic knowledge of git.
 
 ## Make Workspace
-k3sdownloads
+
 Create a workspace to manage the download of code and operational artifacts.
 
 Go to your home directory:
@@ -14,14 +14,14 @@ Go to your home directory:
 cd ~
 ```
 
-Create the k3sdownloads directory.
+Create the downloads directory.
 ```
-mkdir k3sdownloads
+mkdir downloads
 ```
 
 Navigate to the new directory:
 ```
-cd k3sdownloads
+cd downloads
 ```
 
 Make sure you have the wget application:
@@ -37,7 +37,7 @@ If you do not receive the following, you will need to install it.
 
 You will need to clone Vulcan to get some of the helm charts as well as the yaml files required to run Vulcan.
 
-Inside the k3sdownloads directory, run the command:
+Inside the downloads directory, run the command:
 ```
 git clone https://github.com/Volentix/Vulcan.git
 ```
@@ -114,7 +114,7 @@ First run the following too see if Traefik pod is running.
 k get  po -n kube-system
 ```
 
-You should see a record similar to the following:
+You should see a record similar (the prefix on traefik- will different) to the following:
 ```
 kube-system          traefik-55bd9646fc-xsdq7                  1/1     Running     0          15m
 ```
@@ -137,20 +137,23 @@ You should no longer see the traefik pod running.
 
 First you mist move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
 
-The zip files can be found in the project root/src/helm directory. If you created the k3sdownloads in the home directory, you can use the following.
+The zip files can be found in the project root/src/helm directory. If you created the downloads in the home directory, you can use the following.
 ```
-cd ~/k3sdownloads/Vulcan/src/helm
+cd ~/downloads/Vulcan/src/helm
 ```
 
 Next copy the files over to the charts directory:
 ```
-cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
-cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
+sudo cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
+sudo cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
 ```
 
-Once this is complete, cd back unt the src/kube directory
-
 ### Set Up The Namespace
+
+Move to the kube directory.
+```
+cd ~/downloads/Vulcan/src/kube
+```
 
 Set up the namespace for Istio components to run within.
 ```
@@ -170,3 +173,6 @@ Next install istio and its components.
 ```
 k3s kubectl apply -f 3.istio-main.yaml
 ```
+Isto is now integrated into K3s and you can begin your development against it.
+
+Namespaces, such as vdex, will need to label themselves with the `istio-injection=enabled`. With this annotation, pods deployed will be injected with the appropriate envoy cartridges to capture telemetry metrics and manage security.
