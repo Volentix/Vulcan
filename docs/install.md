@@ -105,6 +105,32 @@ Once the script is available locally, you can run the following scipt:
 k3s kubectl apply -f local-path-storage.yaml
 ```
 
+## Delete Traefik
+
+K3s bundles with [Traefik](https://traefik.io/), however, we will be using Istio instead.
+
+First run the following too see if Traefik pod is running.
+```
+k get  po -n kube-system
+```
+
+You should see a record similar to the following:
+```
+kube-system          traefik-55bd9646fc-xsdq7                  1/1     Running     0          15m
+```
+
+To remove Traefik you will need access to the root account.
+```
+sudo k3s kubectl delete -f /var/lib/rancher/k3s/server/manifests/traefik.yaml
+```
+
+Now run the get pods command again:
+```
+k get  po -n kube-system
+```
+
+You should no longer see the traefik pod running.
+
 ## Install Istio
 
 ### Move Helm Charts
