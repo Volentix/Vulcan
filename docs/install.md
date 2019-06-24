@@ -111,7 +111,7 @@ K3s bundles with [Traefik](https://traefik.io/), however, we will be using Istio
 
 First run the following too see if Traefik pod is running.
 ```
-k get  po -n kube-system
+k3s kubectl get  po -n kube-system
 ```
 
 You should see a record similar (the prefix on traefik- will different) to the following:
@@ -126,7 +126,7 @@ sudo k3s kubectl delete -f /var/lib/rancher/k3s/server/manifests/traefik.yaml
 
 Now run the get pods command again:
 ```
-k get  po -n kube-system
+k3s kubectl get  po -n kube-system
 ```
 
 You should no longer see the traefik pod running.
@@ -135,7 +135,7 @@ You should no longer see the traefik pod running.
 
 ### Move Helm Charts
 
-First you mist move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
+First you must move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
 
 The zip files can be found in the project root/src/helm directory. If you created the downloads in the home directory, you can use the following.
 ```
