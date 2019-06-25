@@ -3,178 +3,111 @@ The following guide you though the installation of Vulcan on your PC.
 
 ## Before You Begin
 
-This tutorial assumes that you are running Linux on your machine and that you have some basic knowledge of git.
+This tutorial assumes:
 
-## Make Workspace
+1. You are running Linux. Officially, we support Ubuntu 17.10 and 18.04.
+2. Docker is installed.
+3. Git is installed.
 
-Create a workspace to manage the download of code and operational artifacts.
+## Install Vulcan
 
-Go to your home directory:
-```
-cd ~
-```
-
-Create the downloads directory.
-```
-mkdir downloads
-```
-
-Navigate to the new directory:
-```
-cd downloads
-```
-
-Make sure you have the wget application:
-```
-which wget
-```
-
-If you do not receive the following, you will need to install it.
-```
-/usr/bin/wget
-```
-## Clone Vulcan
-
-You will need to clone Vulcan to get some of the helm charts as well as the yaml files required to run Vulcan.
-
-Inside the downloads directory, run the command:
-```
+Clone Vulcan:
+```bash
 git clone https://github.com/Volentix/Vulcan.git
 ```
 
-## Get K3S
-
-[K3s](https://k3s.io/) is a very, very small version of Kubernetes. However, don't be fooled by its size. In short, K3s removes all the legacy code and not relivant code that has bloated kubernetes. For example, alpha releases are not supported. Similarily, cloud native service provider interfaces.
-
-These limitations do not impeded Vulcan but rather empower it.
-
-To install K3s, run the following, replacing the <VERSION> with a [valid k3s release](https://github.com/rancher/k3s/releases)
+Change into the Vulcan directory.
+```bash
+cd Vulcan
 ```
-wget https://github.com/rancher/k3s/releases/download/<VERSION>/k3s
-```
+Note that you will need to use `sudo` to run these commands.
 
-For example, to get the v0.5.0 version, you would do the following:
-```
-wget https://github.com/rancher/k3s/releases/download/v0.5.0/k3s
+Install [K3s](https://k3s.io/) and run it.
+```bash
+sudo ./k3s_install.sh
 ```
 
-Make the downloaded k3s binary executable:
-```
-chmod +x k3s
+This script will download and start K3s in the terminal. Keep this terminal open and open another terminal.
+
+Install Vulcan.
+
+```bash
+sudo ./vulcan_install.sh
 ```
 
-Move it to the system path for programs:
-```
-sudo mv k3s /bin
-```
+You now have Vulcan installed on your machine. Now you may install vDexNode
 
-Test the install using the following from the command line.
-```
-k3s
-```
-
-You should receive an output showing the `k3s` help documentation.
-
-## Start The Server
-
-
-Start the server and run it in the background:
-```
-sudo k3s server &
-```
-Give the server a few seconds to launch, and then test that the node has been created. If it has not, wait a few more seconds.
-```
-sudo k3s kubectl get node
-```
-
-Now that you know the node is up and running, you can test the infrustructure to make sure everything is running.
-```
-sudo k3s kubectl --all-namespaces=true get all
-```
-
- ## Install Local Storage
-
-K3s does not ship with a default storage driver, however, they do supply a simple one for local storage. For now, this will be fine, however, in time, once larger Vulcan servers come on line, the operator will be able to plug in their own prefered storage driver.
-
-To get local storage for your device download the script as follows:
-```
-curl -LO https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-```
-Once the script is available locally, you can run the following scipt:
-```
-k3s kubectl apply -f local-path-storage.yaml
-```
-
-## Delete Traefik
-
-K3s bundles with [Traefik](https://traefik.io/), however, we will be using Istio instead.
-
-First run the following too see if Traefik pod is running.
-```
-k3s kubectl get  po -n kube-system
-```
-
-You should see a record similar (the prefix on traefik- will different) to the following:
-```
-kube-system          traefik-55bd9646fc-xsdq7                  1/1     Running     0          15m
-```
-
-To remove Traefik you will need access to the root account.
-```
-sudo k3s kubectl delete -f /var/lib/rancher/k3s/server/manifests/traefik.yaml
-```
-
-Now run the get pods command again:
-```
-k3s kubectl get  po -n kube-system
-```
-
-You should no longer see the traefik pod running.
-
-## Install Istio
-
-### Move Helm Charts
-
-First you must move the zipped charts into the `/var/lib/rancher/k3s/server/static/charts` folder.
-
-The zip files can be found in the project root/src/helm directory. If you created the downloads in the home directory, you can use the following.
-```
-cd ~/downloads/Vulcan/src/helm
-```
-
-Next copy the files over to the charts directory:
-```
-sudo cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
-sudo cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
-```
-
-### Set Up The Namespace
-
-Move to the kube directory.
-```
-cd ~/downloads/Vulcan/src/kube
-```
-
-Set up the namespace for Istio components to run within.
-```
-k3s kubectl apply -f 1.istio-namespace.yaml
-```
-
-### Init Istio
-
-Next init istio and install all the CRD's required to run istio
-```
-k3s kubectl apply -f 2.istio-init.yaml
-```
-
-### Main Istio
-
-Next install istio and its components.
-```
-k3s kubectl apply -f 3.istio-main.yaml
-```
-Isto is now integrated into K3s and you can begin your development against it.
-
-## Istio Auto Magic Injection
+### Istio Auto Magic Injection
 
 Namespaces, such as vdex, will need to label themselves with the `istio-injection=enabled`. With this annotation, pods deployed will be injected with the appropriate envoy cartridges to capture telemetry metrics and manage security.
+
+## Install vDexNode
+
+Once Vulcan is installed, install Vulcan. Note that the install of Vulcan will require 2 command line arguments.
+
+1. **eos_public_address:** Your public address on EOS that will be credited.
+2. **namespace:** You are able to install multiple instances of vdex on one Vulcan install, however, each instance will require its own namespace. Namespaces are named logic partisions on Vulcan. You cannot deploy multiple versions of vdex into the same namespace. If this is unclear, just use `vdex` as your namespace. Please note that namespaces CANNOT have spaces of special chars in them. For now the script is pretty bare so please be careful.
+
+As a helper, you can use the shell script to deploy your cluster. Future, more advanced scripts will be built on Helm but for now this should get us going.
+
+To begin, you will need to change to the parent directory:
+```bash
+cd ../
+```
+
+Clone the vDexNode repo:
+```bash
+git clone git@github.com:Volentix/vDexNode.git
+```
+
+Change into the kube directory:
+```bash
+cd vDexNode/kube
+```
+
+Next deploy vdex with the shell script. Note replace `YOUR_EOS_PUBLIC_ADDRESS` with your eos address. Also, replace the`YOUR_NAMESPACE` with one of your choosing:
+```bash
+./deploy.sh YOUR_EOS_PUBLIC_ADDRESS YOUR_NAMESPACE
+```
+
+The script will create the yaml files in a directory called deploy. It then runs the kubernetes intall commands. Note that the files are kept in case inspection is desired, however, they will be ignored by git.
+
+### Usaging vDexNode
+
+If you have installed vDex on Vulcan, you will need to run open up some ports to communicate with vDex. This is not necessary with the docker install. Note this restriction will be removed in a future release.
+
+As above, replace the `YOUR_NAMESPACE` below with the namespace you are using. Note that it appears twice in the commands.
+
+#### Get Node Info
+
+To the the node info, you will need to run the following if you have deployed on **Vulcan**.
+```bash
+k3s kubectl -n YOUR_NAMESPACE port-forward $(k3s kubectl -n YOUR_NAMESPACE get pod -l app=vdex-node -o jsonpath='{.items[0].metadata.name}') 8100:8100
+```
+
+You can then curl the instance for the nodes information:
+```bash
+curl http://localhost:8100
+```
+#### Scan Nodes
+
+To the the list of nodes, you will need to run the following if you have deployed on **Vulcan**.
+```bash
+k3s kubectl -n YOUR_NAMESPACE port-forward $(k3s kubectl -n YOUR_NAMESPACE get pod -l app=vdex-node -o jsonpath='{.items[0].metadata.name}') 9080:9080
+```
+
+You can then curl the instance:
+```bash
+curl http://localhost:9080/getConnectedNodes
+```
+#### Kiali
+
+If you have installed vdex on Vulcan, you can open up the Kiali dashboard to get information about the cluster. First open the port:
+```bash
+k3s kubectl -n istio-system port-forward $(k3s kubectl -n istio-system get pod -l app=kiali -o jsonpath='{.items[0].metadata.name}') 20001:20001
+```
+
+You can now, in the web browser of your choosing, open up the dashboard. Note that the default username and password are both `admin`.
+```bash
+http://localhost:20001/kiali/console/
+```
