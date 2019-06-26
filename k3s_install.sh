@@ -10,9 +10,8 @@ mv k3s /bin
 
 sudo nohup  k3s server &>/dev/null &
 
-echo "Sleeping..."
-sleep 3
-
+echo "Sleeping while k3s starts up..."
+sleep 15
 
 curl -LO https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 
@@ -25,7 +24,6 @@ cd src/helm
 cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
 
 cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
-
 
 cd ../kube/
 

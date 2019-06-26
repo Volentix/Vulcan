@@ -12,7 +12,7 @@ cp istio-init.tgz /var/lib/rancher/k3s/server/static/charts/istio-init.tgz
 
 cp istio.tgz /var/lib/rancher/k3s/server/static/charts/istio.tgz
 
-cd ~/downloads/Vulcan/src/kube
+cd ../kube/
 
 k3s kubectl apply -f 1.istio-namespace.yaml
 
